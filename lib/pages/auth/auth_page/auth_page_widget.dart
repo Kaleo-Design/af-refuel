@@ -597,70 +597,127 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                     alignment:
                                                         AlignmentDirectional(
                                                             0.0, 0.0),
-                                                    child: FFButtonWidget(
-                                                      onPressed:
-                                                          (valueOrDefault<bool>(
-                                                                    _model.emailAddressSignInTextController.text ==
-                                                                            '',
-                                                                    true,
-                                                                  ) ||
-                                                                  valueOrDefault<
-                                                                      bool>(
-                                                                    _model.passwordSignInTextController.text ==
-                                                                            '',
-                                                                    true,
-                                                                  ))
-                                                              ? null
-                                                              : () async {
-                                                                  var _shouldSetState =
-                                                                      false;
-                                                                  _model.signInResponse =
-                                                                      await SignInCall
-                                                                          .call(
-                                                                    email: _model
-                                                                        .emailAddressSignInTextController
-                                                                        .text,
-                                                                    password: _model
-                                                                        .passwordSignInTextController
-                                                                        .text,
-                                                                  );
+                                                    child: InkWell(
+                                                      splashColor:
+                                                          Colors.transparent,
+                                                      focusColor:
+                                                          Colors.transparent,
+                                                      hoverColor:
+                                                          Colors.transparent,
+                                                      highlightColor:
+                                                          Colors.transparent,
+                                                      onLongPress: () async {
+                                                        context.pushNamed(
+                                                            SleepDevPageWidget
+                                                                .routeName);
+                                                      },
+                                                      child: FFButtonWidget(
+                                                        onPressed:
+                                                            (valueOrDefault<
+                                                                        bool>(
+                                                                      _model.emailAddressSignInTextController.text ==
+                                                                              '',
+                                                                      true,
+                                                                    ) ||
+                                                                    valueOrDefault<
+                                                                        bool>(
+                                                                      _model.passwordSignInTextController.text ==
+                                                                              '',
+                                                                      true,
+                                                                    ))
+                                                                ? null
+                                                                : () async {
+                                                                    var _shouldSetState =
+                                                                        false;
+                                                                    _model.signInResponse =
+                                                                        await SignInCall
+                                                                            .call(
+                                                                      email: _model
+                                                                          .emailAddressSignInTextController
+                                                                          .text,
+                                                                      password: _model
+                                                                          .passwordSignInTextController
+                                                                          .text,
+                                                                    );
 
-                                                                  _shouldSetState =
-                                                                      true;
-                                                                  if ((_model
-                                                                          .signInResponse
-                                                                          ?.succeeded ??
-                                                                      true)) {
-                                                                    if (SignInCall
-                                                                            .account(
-                                                                          (_model.signInResponse?.jsonBody ??
-                                                                              ''),
-                                                                        ) !=
-                                                                        null) {
-                                                                      GoRouter.of(
-                                                                              context)
-                                                                          .prepareAuthEvent();
-                                                                      await authManager
-                                                                          .signIn(
-                                                                        authenticationToken:
-                                                                            SignInCall.token(
-                                                                          (_model.signInResponse?.jsonBody ??
-                                                                              ''),
-                                                                        ),
-                                                                        authUid:
-                                                                            currentUserUid,
-                                                                        userData:
-                                                                            SignInCall.account(
-                                                                          (_model.signInResponse?.jsonBody ??
-                                                                              ''),
-                                                                        ),
-                                                                      );
+                                                                    _shouldSetState =
+                                                                        true;
+                                                                    if ((_model
+                                                                            .signInResponse
+                                                                            ?.succeeded ??
+                                                                        true)) {
+                                                                      if (SignInCall
+                                                                              .account(
+                                                                            (_model.signInResponse?.jsonBody ??
+                                                                                ''),
+                                                                          ) !=
+                                                                          null) {
+                                                                        GoRouter.of(context)
+                                                                            .prepareAuthEvent();
+                                                                        await authManager
+                                                                            .signIn(
+                                                                          authenticationToken:
+                                                                              SignInCall.token(
+                                                                            (_model.signInResponse?.jsonBody ??
+                                                                                ''),
+                                                                          ),
+                                                                          authUid:
+                                                                              currentUserUid,
+                                                                          userData:
+                                                                              SignInCall.account(
+                                                                            (_model.signInResponse?.jsonBody ??
+                                                                                ''),
+                                                                          ),
+                                                                        );
 
-                                                                      context.goNamedAuth(
-                                                                          MainHomeWidget
-                                                                              .routeName,
-                                                                          context
-                                                                              .mounted);
+                                                                        context.goNamedAuth(
+                                                                            MainHomeWidget.routeName,
+                                                                            context.mounted);
+                                                                      } else {
+                                                                        // update_page_with_error
+                                                                        _model.signInError =
+                                                                            valueOrDefault<String>(
+                                                                          SignInCall
+                                                                              .errorDescription(
+                                                                            (_model.signInResponse?.jsonBody ??
+                                                                                ''),
+                                                                          ),
+                                                                          'Login failed, try again.',
+                                                                        );
+                                                                        safeSetState(
+                                                                            () {});
+                                                                        // show_error
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                            content:
+                                                                                Text(
+                                                                              valueOrDefault<String>(
+                                                                                _model.signInError,
+                                                                                'Login failed, try again.',
+                                                                              ),
+                                                                              style: FlutterFlowTheme.of(context).titleMedium.override(
+                                                                                    fontFamily: 'Figtree',
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                    letterSpacing: 0.0,
+                                                                                  ),
+                                                                            ),
+                                                                            duration:
+                                                                                Duration(milliseconds: 4000),
+                                                                            backgroundColor:
+                                                                                FlutterFlowTheme.of(context).secondary,
+                                                                          ),
+                                                                        );
+                                                                        if (_shouldSetState)
+                                                                          safeSetState(
+                                                                              () {});
+                                                                        return;
+                                                                      }
+
+                                                                      if (_shouldSetState)
+                                                                        safeSetState(
+                                                                            () {});
+                                                                      return;
                                                                     } else {
                                                                       // update_page_with_error
                                                                       _model.signInError =
@@ -678,14 +735,14 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                       // show_error
                                                                       ScaffoldMessenger.of(
                                                                               context)
+                                                                          .clearSnackBars();
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
                                                                           .showSnackBar(
                                                                         SnackBar(
                                                                           content:
                                                                               Text(
-                                                                            valueOrDefault<String>(
-                                                                              _model.signInError,
-                                                                              'Login failed, try again.',
-                                                                            ),
+                                                                            _model.signInError!,
                                                                             style: FlutterFlowTheme.of(context).titleMedium.override(
                                                                                   fontFamily: 'Figtree',
                                                                                   color: FlutterFlowTheme.of(context).primaryText,
@@ -693,7 +750,7 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                                 ),
                                                                           ),
                                                                           duration:
-                                                                              Duration(milliseconds: 4000),
+                                                                              Duration(milliseconds: 3000),
                                                                           backgroundColor:
                                                                               FlutterFlowTheme.of(context).secondary,
                                                                         ),
@@ -707,120 +764,74 @@ class _AuthPageWidgetState extends State<AuthPageWidget>
                                                                     if (_shouldSetState)
                                                                       safeSetState(
                                                                           () {});
-                                                                    return;
-                                                                  } else {
-                                                                    // update_page_with_error
-                                                                    _model.signInError =
-                                                                        valueOrDefault<
-                                                                            String>(
-                                                                      SignInCall
-                                                                          .errorDescription(
-                                                                        (_model.signInResponse?.jsonBody ??
-                                                                            ''),
-                                                                      ),
-                                                                      'Login failed, try again.',
-                                                                    );
-                                                                    safeSetState(
-                                                                        () {});
-                                                                    // show_error
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .clearSnackBars();
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      SnackBar(
-                                                                        content:
-                                                                            Text(
-                                                                          _model
-                                                                              .signInError!,
-                                                                          style: FlutterFlowTheme.of(context)
-                                                                              .titleMedium
-                                                                              .override(
-                                                                                fontFamily: 'Figtree',
-                                                                                color: FlutterFlowTheme.of(context).primaryText,
-                                                                                letterSpacing: 0.0,
-                                                                              ),
-                                                                        ),
-                                                                        duration:
-                                                                            Duration(milliseconds: 3000),
-                                                                        backgroundColor:
-                                                                            FlutterFlowTheme.of(context).secondary,
-                                                                      ),
-                                                                    );
-                                                                    if (_shouldSetState)
-                                                                      safeSetState(
-                                                                          () {});
-                                                                    return;
-                                                                  }
-
-                                                                  if (_shouldSetState)
-                                                                    safeSetState(
-                                                                        () {});
-                                                                },
-                                                      text: 'Sign In',
-                                                      options: FFButtonOptions(
-                                                        width: double.infinity,
-                                                        height: 48.0,
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    24.0,
-                                                                    0.0,
-                                                                    24.0,
-                                                                    0.0),
-                                                        iconPadding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0),
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
-                                                        textStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .titleMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Figtree',
-                                                                  letterSpacing:
+                                                                  },
+                                                        text: 'Sign In',
+                                                        options:
+                                                            FFButtonOptions(
+                                                          width:
+                                                              double.infinity,
+                                                          height: 48.0,
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                      24.0,
                                                                       0.0,
-                                                                ),
-                                                        elevation: 3.0,
-                                                        borderSide: BorderSide(
-                                                          color: Colors
-                                                              .transparent,
-                                                          width: 1.0,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
-                                                        disabledColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .accent1,
-                                                        disabledTextColor:
-                                                            Color(0x80FFFFFF),
-                                                        hoverColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .accent1,
-                                                        hoverBorderSide:
-                                                            BorderSide(
+                                                                      24.0,
+                                                                      0.0),
+                                                          iconPadding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0),
                                                           color: FlutterFlowTheme
                                                                   .of(context)
                                                               .primary,
-                                                          width: 1.0,
+                                                          textStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .titleMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Figtree',
+                                                                    letterSpacing:
+                                                                        0.0,
+                                                                  ),
+                                                          elevation: 3.0,
+                                                          borderSide:
+                                                              BorderSide(
+                                                            color: Colors
+                                                                .transparent,
+                                                            width: 1.0,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      8.0),
+                                                          disabledColor:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .accent1,
+                                                          disabledTextColor:
+                                                              Color(0x80FFFFFF),
+                                                          hoverColor:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .accent1,
+                                                          hoverBorderSide:
+                                                              BorderSide(
+                                                            color: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .primary,
+                                                            width: 1.0,
+                                                          ),
+                                                          hoverTextColor:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .primaryText,
+                                                          hoverElevation: 0.0,
                                                         ),
-                                                        hoverTextColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
-                                                        hoverElevation: 0.0,
                                                       ),
                                                     ),
                                                   ),

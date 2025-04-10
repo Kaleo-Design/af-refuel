@@ -72,9 +72,28 @@ class _SleepDevPageWidgetState extends State<SleepDevPageWidget> {
                 alignment: AlignmentDirectional(0.0, 0.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    _model.sleepActionData = await actions.retrieveSleepData();
-                    _model.sleepData = _model.sleepActionData;
-                    safeSetState(() {});
+                    _model.permissionsEnabled =
+                        await actions.healthKitPermissions();
+                    if (_model.permissionsEnabled!) {
+                      _model.sleepActionData =
+                          await actions.retrieveSleepData();
+                      _model.sleepData = _model.sleepActionData;
+                      safeSetState(() {});
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Permissions Denied',
+                            style: TextStyle(
+                              color: FlutterFlowTheme.of(context).primaryText,
+                            ),
+                          ),
+                          duration: Duration(milliseconds: 4000),
+                          backgroundColor:
+                              FlutterFlowTheme.of(context).secondary,
+                        ),
+                      );
+                    }
 
                     safeSetState(() {});
                   },

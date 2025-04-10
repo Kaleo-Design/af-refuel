@@ -13,6 +13,8 @@ class SleepDevPageModel extends FlutterFlowModel<SleepDevPageWidget> {
 
   ///  State fields for stateful widgets in this page.
 
+  // Stores action output result for [Custom Action - healthKitPermissions] action in Button widget.
+  bool? permissionsEnabled;
   // Stores action output result for [Custom Action - retrieveSleepData] action in Button widget.
   dynamic sleepActionData;
   // Stores action output result for [Custom Action - retrieveWorkoutData] action in Button widget.
