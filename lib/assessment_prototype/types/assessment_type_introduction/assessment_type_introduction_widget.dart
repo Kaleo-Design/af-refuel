@@ -74,6 +74,7 @@ class _AssessmentTypeIntroductionWidgetState
               wrapWithModel(
                 model: _model.headingJmlGroupModel,
                 updateCallback: () => safeSetState(() {}),
+                updateOnChange: true,
                 child: JmlGroupRenderWidget(
                   jmlItems: widget.introductionData!.heading,
                 ),
@@ -86,6 +87,7 @@ class _AssessmentTypeIntroductionWidgetState
               wrapWithModel(
                 model: _model.privacyJmlGroupModel,
                 updateCallback: () => safeSetState(() {}),
+                updateOnChange: true,
                 child: JmlGroupRenderWidget(
                   jmlItems: widget.introductionData!.privacy,
                 ),
@@ -98,6 +100,7 @@ class _AssessmentTypeIntroductionWidgetState
               wrapWithModel(
                 model: _model.processJmlGroupModel,
                 updateCallback: () => safeSetState(() {}),
+                updateOnChange: true,
                 child: JmlGroupRenderWidget(
                   jmlItems: widget.introductionData!.process,
                 ),
@@ -110,6 +113,7 @@ class _AssessmentTypeIntroductionWidgetState
               wrapWithModel(
                 model: _model.purposeJmlGroupModel,
                 updateCallback: () => safeSetState(() {}),
+                updateOnChange: true,
                 child: JmlGroupRenderWidget(
                   jmlItems: widget.introductionData!.purpose,
                 ),

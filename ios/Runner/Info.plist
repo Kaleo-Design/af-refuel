@@ -45,6 +45,10 @@
 
 	<key>PermissionGroupNotification</key>
     <string>Allow Refuel to send you notifications pertaining to workouts, chat and various in-app events</string>
+	<key>NSHealthShareUsageDescription</key>
+    <string>This app uses Health data to provide personalized fitness recommendations.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+    <string>This app writes workout and activity data to Health to track your fitness goals.</string>
 
 
 
