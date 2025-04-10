@@ -46,7 +46,7 @@ class HealthKitPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func requestAuthorization(result: @escaping flutterResult) {
+    private func requestAuthorization(result: @escaping FlutterResult) {
         let writeTypes: Set<HKSampleType> = [
             HKObjectType.workoutType(),
             HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!,
@@ -96,7 +96,7 @@ class HealthKitPlugin: NSObject, FlutterPlugin {
             }
         }
     }
-    
+
     // Currently not used
     private func getVo2Max(result: @escaping FlutterResult) {
         guard let vo2MaxType = HKObjectType.quantityType(forIdentifier: .vo2Max) else {
