@@ -119,10 +119,26 @@ class _SleepDevPageWidgetState extends State<SleepDevPageWidget> {
                 alignment: AlignmentDirectional(0.0, 0.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    _model.workoutActionData =
-                        await actions.retrieveWorkoutData();
-                    _model.workoutData = _model.workoutActionData;
-                    safeSetState(() {});
+                    if (_model.permissionsEnabled!) {
+                      _model.workoutActionData =
+                          await actions.retrieveWorkoutData();
+                      _model.workoutData = _model.workoutActionData;
+                      safeSetState(() {});
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Permissions Denied',
+                            style: TextStyle(
+                              color: FlutterFlowTheme.of(context).primaryText,
+                            ),
+                          ),
+                          duration: Duration(milliseconds: 4000),
+                          backgroundColor:
+                              FlutterFlowTheme.of(context).secondary,
+                        ),
+                      );
+                    }
 
                     safeSetState(() {});
                   },
@@ -148,10 +164,26 @@ class _SleepDevPageWidgetState extends State<SleepDevPageWidget> {
                 alignment: AlignmentDirectional(0.0, 0.0),
                 child: FFButtonWidget(
                   onPressed: () async {
-                    _model.runningActionData =
-                        await actions.retrieveRunningData();
-                    _model.runningData = _model.runningActionData;
-                    safeSetState(() {});
+                    if (_model.permissionsEnabled!) {
+                      _model.runningActionData =
+                          await actions.retrieveRunningData();
+                      _model.runningData = _model.runningActionData;
+                      safeSetState(() {});
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Permissions Denied',
+                            style: TextStyle(
+                              color: FlutterFlowTheme.of(context).primaryText,
+                            ),
+                          ),
+                          duration: Duration(milliseconds: 4000),
+                          backgroundColor:
+                              FlutterFlowTheme.of(context).secondary,
+                        ),
+                      );
+                    }
 
                     safeSetState(() {});
                   },

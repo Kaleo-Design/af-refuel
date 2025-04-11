@@ -1,10 +1,7 @@
 import '/assessment_prototype/jml/jml_group_render/jml_group_render_widget.dart';
-import '/backend/api_requests/api_calls.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'assessment_type_introduction_model.dart';
 export 'assessment_type_introduction_model.dart';
 
@@ -35,17 +32,6 @@ class _AssessmentTypeIntroductionWidgetState
   void initState() {
     super.initState();
     _model = createModel(context, () => AssessmentTypeIntroductionModel());
-
-    // On component load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.introResponse = await AssessmentsIntroductionCall.call();
-
-      if ((_model.introResponse?.succeeded ?? true)) {
-        _model.introductionData = functions
-            .parseIntroductionJson((_model.introResponse?.jsonBody ?? ''));
-        safeSetState(() {});
-      }
-    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }

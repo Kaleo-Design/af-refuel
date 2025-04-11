@@ -423,57 +423,79 @@ AssessmentResponseActionType getAssesementResponseType(dynamic actionJson) {
   }
 }
 
-IntroductionDataStruct? parseIntroductionJson(dynamic introductionJson) {
-  if (introductionJson == null) {
-    return null;
-  }
+IntroductionDataStruct? parseIntroductionJson(
+  dynamic assessmentJson,
+  int? loopIndex,
+) {
+  // Extract items list from the JSON response
+  List<dynamic> items = assessmentJson['assessment']['items'];
 
-  final introductionData = IntroductionDataStruct();
+  // Safety check to ensure index is valid
+  if (loopIndex != null && loopIndex >= 0 && loopIndex < items.length) {
+    dynamic item = items[loopIndex];
 
-  JmlRenderType mapToEnum(String key) {
-    switch (key) {
-      case 'h1':
-        return JmlRenderType.h1;
-      case 'h2':
-        return JmlRenderType.h2;
-      case 'p':
-        return JmlRenderType.p;
-      case 'img':
-        return JmlRenderType.img;
-      case 'button':
-        return JmlRenderType.button;
-      default:
-        return JmlRenderType.p; // Default to 'p' if type is unknown
+    // Extract 'introduction' type object from the item
+    if (item.containsKey('introduction')) {
+      dynamic introJson = item['introduction'];
+      final introductionData = IntroductionDataStruct();
+
+      // Convert string key to enum
+      JmlRenderType mapToEnum(String key) {
+        switch (key) {
+          case 'h1':
+            return JmlRenderType.h1;
+          case 'h2':
+            return JmlRenderType.h2;
+          case 'p':
+            return JmlRenderType.p;
+          case 'img':
+            return JmlRenderType.img;
+          case 'button':
+            return JmlRenderType.button;
+          default:
+            return JmlRenderType.p;
+        }
+      }
+
+      // Parse section array to list of JmlWrapperStructs
+      List<JmlWrapperStruct> parseSection(List<dynamic>? section) {
+        if (section == null) return [];
+
+        return section.map((item) {
+          if (item is Map<String, dynamic>) {
+            final key = item.keys.first;
+            final content = item[key];
+
+            if (content is String) {
+              return JmlWrapperStruct(
+                type: mapToEnum(key),
+                textValue: content,
+              );
+            }
+
+            return JmlWrapperStruct(
+              type: mapToEnum(key),
+              textValue: content?['text'],
+              imageUrl: content?['url'],
+              buttonTitle: content?['title'],
+              buttonSubtitle: content?['subtitle'],
+              buttonUrl: content?['url'],
+            );
+          }
+          return JmlWrapperStruct();
+        }).toList();
+      }
+
+      introductionData.heading = parseSection(introJson['heading']);
+      introductionData.privacy = parseSection(introJson['privacy']);
+      introductionData.process = parseSection(introJson['process']);
+      introductionData.purpose = parseSection(introJson['purpose']);
+
+      return introductionData;
     }
   }
 
-  // Function to parse a list of items from JSON and convert them into JMLWrapperStruct
-  List<JmlWrapperStruct> parseSection(List<dynamic>? section) {
-    if (section == null) return [];
-
-    return section.map((item) {
-      if (item is Map<String, dynamic>) {
-        final key = item
-            .keys.first; // Extracts the HTML tag type (e.g., h1, h2, p, img)
-        final content = item[key];
-
-        return JmlWrapperStruct(
-          type: mapToEnum(key),
-          textValue: content?['text'],
-          imageUrl: content?['url'],
-        );
-      }
-      return JmlWrapperStruct();
-    }).toList();
-  }
-
-  // Assign parsed data to the respective fields in IntroductionDataStruct
-  introductionData.heading = parseSection(introductionJson['heading']);
-  introductionData.privacy = parseSection(introductionJson['privacy']);
-  introductionData.process = parseSection(introductionJson['process']);
-  introductionData.purpose = parseSection(introductionJson['purpose']);
-
-  return introductionData;
+  return null;
 }
 
 String? convertImageUrlToPath(String? imageUrl) {

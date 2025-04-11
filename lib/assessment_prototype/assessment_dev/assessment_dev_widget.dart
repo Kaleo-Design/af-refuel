@@ -167,12 +167,8 @@ class _AssessmentDevWidgetState extends State<AssessmentDevWidget> {
                       true,
                     ),
                     typeIntroductionData: functions.parseIntroductionJson(
-                        ContentDetailMockCall.introductionJSON(
-                      ContentDetailMockCall.items(
                         (_model.assessApiResult?.jsonBody ?? ''),
-                      )!
-                          .elementAtOrNull(_model.loopIndex),
-                    )),
+                        _model.loopIndex),
                     indexInLocal: _model.loopIndex,
                   )),
                 ),
@@ -615,7 +611,10 @@ class _AssessmentDevWidgetState extends State<AssessmentDevWidget> {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  if (FFAppState().assessmentDataHolder.skip)
+                  if (valueOrDefault<bool>(
+                    FFAppState().assessmentDataHolder.skip,
+                    false,
+                  ))
                     Align(
                       alignment: AlignmentDirectional(1.0, 0.0),
                       child: Padding(

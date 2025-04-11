@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'dart:math';
 
 /// Retrieve sleep data from HealthKit
 Future<dynamic> retrieveWorkoutData() async {
@@ -95,4 +96,38 @@ Future<dynamic> retrieveWorkoutData() async {
       {"error": "PlatformException", "message": e.message ?? "Unknown error"}
     ];
   }
+}
+
+List<Map<String, dynamic>> createMockWorkoutData() {
+  final now = DateTime.now().toUtc();
+  final fixedTime =
+      Duration(hours: 18, minutes: 25, seconds: 13); // fixed workout time
+
+  final List<Map<String, dynamic>> workouts = List.generate(6, (i) {
+    final date = now.subtract(Duration(days: 6 - i));
+    final startDate =
+        DateTime.utc(date.year, date.month, date.day).add(fixedTime);
+
+    // Hardcoded data as per your original list
+    final data = [
+      {"activityType": 35, "duration": 1800, "totalEnergyBurned": 300},
+      {"activityType": 46, "duration": 2700, "totalEnergyBurned": 450},
+      {"activityType": 14, "duration": 3000, "totalEnergyBurned": 350},
+      {"activityType": 59, "duration": 1200, "totalEnergyBurned": 180},
+      {"activityType": 63, "duration": 1800, "totalEnergyBurned": 400},
+      {"activityType": 50, "duration": 2400, "totalEnergyBurned": 250},
+    ][i];
+
+    final endDate = startDate.add(Duration(seconds: data["duration"]!));
+
+    return {
+      "activityType": data["activityType"],
+      "duration": data["duration"],
+      "totalEnergyBurned": data["totalEnergyBurned"],
+      "startDate": startDate.toIso8601String(),
+      "endDate": endDate.toIso8601String(),
+    };
+  });
+
+  return workouts;
 }
