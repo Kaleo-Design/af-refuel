@@ -1,5 +1,4 @@
 import '/assessment_prototype/jml/jml_group_render/jml_group_render_widget.dart';
-import '/backend/api_requests/api_calls.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'assessment_type_introduction_widget.dart'
@@ -17,8 +16,6 @@ class AssessmentTypeIntroductionModel
 
   ///  State fields for stateful widgets in this component.
 
-  // Stores action output result for [Backend Call - API (Assessments Introduction)] action in assessment_type_introduction widget.
-  ApiCallResponse? introResponse;
   // Model for heading_jml_group.
   late JmlGroupRenderModel headingJmlGroupModel;
   // Model for privacy_jml_group.
