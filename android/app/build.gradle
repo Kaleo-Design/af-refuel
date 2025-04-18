@@ -2,9 +2,9 @@ plugins {
    id "com.android.application"
    id "kotlin-android"
    id "dev.flutter.flutter-gradle-plugin"
-   
-   
 }
+
+apply plugin: 'kotlinx-serialization'
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
@@ -88,4 +88,5 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"
     implementation "androidx.health.connect:connect-client:1.1.0-alpha01"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
 }
