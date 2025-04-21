@@ -7,7 +7,6 @@ import androidx.core.os.BuildCompat
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.BasalMetabolicRateRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
@@ -35,10 +34,10 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+const val HEALTH_DATA_PLATFORM_CHANNEL = "healthData"
+
 @OptIn(BuildCompat.PrereleaseSdkCheck::class)
 class MainActivity : FlutterFragmentActivity() {
-
-    private val PERMISSIONS_CHANNEL = "healthData"
 
     private var pendingResult: MethodChannel.Result? = null
 
@@ -66,7 +65,7 @@ class MainActivity : FlutterFragmentActivity() {
         ) { grantedPermissions ->
             val granted = permissions.all { it in grantedPermissions }
             val missing = permissions - grantedPermissions.toSet()
-            Log.i("Boogie", "Missing permissions: $missing")
+            Log.i("Permissions", "Missing permissions: $missing")
 
             pendingResult?.success(granted)
             pendingResult = null
@@ -78,7 +77,7 @@ class MainActivity : FlutterFragmentActivity() {
 
         val methodChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            PERMISSIONS_CHANNEL
+            HEALTH_DATA_PLATFORM_CHANNEL
         )
 
         methodChannel.setMethodCallHandler { call, result ->
@@ -94,15 +93,11 @@ class MainActivity : FlutterFragmentActivity() {
                     }
                 }
 
-                "populateRunningData" -> {}
-
                 "getSleepData" -> {
                     lifecycleScope.launch {
                         getSleepData(baseContext, result)
                     }
                 }
-
-                "addTestSleepData" -> {}
 
                 "getWorkoutData" -> {
                     lifecycleScope.launch {
@@ -110,12 +105,7 @@ class MainActivity : FlutterFragmentActivity() {
                     }
                 }
 
-                "populateWorkoutData" -> {}
-
-                else -> {
-                    Log.i("TOGGLE", "Not implemented")
-                    result.success("[]")
-                }
+                else -> result.success("[]")
             }
         }
     }
@@ -141,7 +131,7 @@ class MainActivity : FlutterFragmentActivity() {
                 it.exerciseType == ExerciseSessionRecord.EXERCISE_TYPE_RUNNING
             }
 
-            val workouts = mutableListOf<WorkoutData>()
+            val workouts = mutableListOf<RunningData>()
 
             // 2. For each session, fetch aggregates
             for (session in runningSessions) {
@@ -165,10 +155,9 @@ class MainActivity : FlutterFragmentActivity() {
                     energyAggregate[TotalCaloriesBurnedRecord.ENERGY_TOTAL]?.inKilocalories ?: 0.0
 
                 workouts.add(
-                    WorkoutData(
-                        type = 1,
-                        start = formatter.format(session.startTime),
-                        end = formatter.format(session.endTime),
+                    RunningData(
+                        startDate = formatter.format(session.startTime),
+                        endDate = formatter.format(session.endTime),
                         durationMinutes = Duration.between(session.startTime, session.endTime)
                             .toMinutes().toDouble(),
                         distanceMeters = distance,
@@ -177,7 +166,7 @@ class MainActivity : FlutterFragmentActivity() {
                 )
             }
 
-            val json = Json.encodeToString(ListSerializer(WorkoutData.serializer()), workouts)
+            val json = Json.encodeToString(ListSerializer(RunningData.serializer()), workouts)
             result.success(json)
 
         } catch (e: Exception) {
@@ -216,9 +205,9 @@ class MainActivity : FlutterFragmentActivity() {
 
                 workouts.add(
                     WorkoutData(
-                        type = session.exerciseType,
-                        start = formatter.format(session.startTime),
-                        end = formatter.format(session.endTime),
+                        androidActivityType = session.exerciseType,
+                        startDate = formatter.format(session.startTime),
+                        endDate = formatter.format(session.endTime),
                         durationMinutes = Duration.between(session.startTime, session.endTime)
                             .toMinutes().toDouble(),
                         energyBurned = energy,
@@ -242,19 +231,19 @@ class MainActivity : FlutterFragmentActivity() {
         val formatter = DateTimeFormatter.ISO_INSTANT
 
         try {
-            val response = client.readRecords(
+            val sessionsResponse = client.readRecords(
                 ReadRecordsRequest(
                     recordType = SleepSessionRecord::class,
                     timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
                 )
             )
 
-            val sleepSessions = response.records.map { record ->
+            val sleepSessions = sessionsResponse.records.map { record ->
                 SleepData(
-                    start = formatter.format(record.startTime),
-                    end = formatter.format(record.endTime),
-                    title = record.title,
-                    notes = record.notes
+                    startDate = formatter.format(record.startTime),
+                    endDate = formatter.format(record.endTime),
+                    title = record.title ?: "",
+                    notes = record.notes ?: ""
                 )
             }
 
@@ -262,24 +251,33 @@ class MainActivity : FlutterFragmentActivity() {
             result.success(json)
 
         } catch (e: Exception) {
-            result.error("SLEEP_QUERY_ERROR", "Failed to fetch sleep data", e.localizedMessage)
+            result.error("HEALTH_CONNECT_ERROR", "Failed to fetch sleep data", e.localizedMessage)
         }
     }
 }
 
 @Serializable
 data class SleepData(
-    val start: String,
-    val end: String,
-    val title: String? = null,
-    val notes: String? = null,
+    val startDate: String,
+    val endDate: String,
+    val title: String = "",
+    val notes: String = "",
+    val stage: String = ""
 )
 
 @Serializable
 data class WorkoutData(
-    val type: Int,  // Maps to ExerciseSessionRecord.EXERCISE_TYPE_* constants
-    val start: String,
-    val end: String,
+    val androidActivityType: Int,
+    val startDate: String,
+    val endDate: String,
+    val durationMinutes: Double,
+    val energyBurned: Double? = null,
+)
+
+@Serializable
+data class RunningData(
+    val startDate: String,
+    val endDate: String,
     val durationMinutes: Double,
     val distanceMeters: Double? = null,
     val energyBurned: Double? = null,
