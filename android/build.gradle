@@ -5,20 +5,6 @@ allprojects {
     }
 }
 
-buildscript {
-    ext.kotlin_version = '1.8.22'
-
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
-    }
-}
-
 rootProject.buildDir = '../build'
 
 subprojects {
@@ -42,12 +28,12 @@ subprojects {
             }
         }
         if (project.hasProperty('android')) {
-                project.android {
-                    if (namespace == null) {
-                        namespace project.group
-                    }
+            project.android {
+                if (namespace == null) {
+                    namespace project.group
                 }
             }
+        }
     }
 }
 subprojects {
@@ -57,6 +43,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-tasks.register("clean", Delete) {
+task clean(type: Delete) {
     delete rootProject.buildDir
 }
