@@ -138,12 +138,19 @@ class HealthKitPlugin: NSObject, FlutterPlugin {
 
             let workoutData: [[String: Any]] = workouts.map { workout in
                 return [
-                    "activityType": workout.workoutActivityType.rawValue,
-                    "duration": workout.duration,
-                    "totalEnergyBurned": workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0,
+                    "iOSActivityType": workout.workoutActivityType.rawValue,
+                    "durationMinutes": workout.duration,
+                    "energyBurned": workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0,
                     "startDate": ISO8601DateFormatter().string(from: workout.startDate),
-                    "endDate": ISO8601DateFormatter().string(from: workout.endDate)
+                    "endDate": ISO8601DateFormatter().string(from: workout.endDate),
                 ]
+                
+                val androidActivityType: Int,
+                val start: String,
+                val end: String,
+                val durationMinutes: Double,
+                val distanceMeters: Double? = null,
+                val energyBurned: Double? = null,
             }
 
             do {
@@ -179,6 +186,15 @@ class HealthKitPlugin: NSObject, FlutterPlugin {
             4: "DeepSleep",
             5: "REM"
         ]
+        
+        let titleValues = [
+            0: "In Bed",
+            1: "Asleep",
+            2: "Awake",
+            3: "Core Sleep",
+            4: "Deep Sleep",
+            5: "REM"
+        ]
 
         let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { _, samples, error in
 
@@ -190,10 +206,11 @@ class HealthKitPlugin: NSObject, FlutterPlugin {
             let formatter = ISO8601DateFormatter()
             let serialized: [[String: Any]] = categorySamples.map { sample in
                 return [
-                    "start": formatter.string(from: sample.startDate),
-                    "end": formatter.string(from: sample.endDate),
-                    "value": sample.value, // raw int value
-                    "state": stateMap[sample.value]
+                    "startDate": formatter.string(from: sample.startDate),
+                    "endDate": formatter.string(from: sample.endDate),
+                    "title": stateMap[sample.value] ?? "Unknown",
+                    "state": titleValues[sample.value] ?? "Unknown",
+                    "notes": "",
                 ]
             }
 
@@ -232,8 +249,8 @@ class HealthKitPlugin: NSObject, FlutterPlugin {
             let formatter = ISO8601DateFormatter()
             let dataArray: [[String: Any]] = workouts.map { workout in
                 return [
-                    "start": formatter.string(from: workout.startDate),
-                    "end": formatter.string(from: workout.endDate),
+                    "startDate": formatter.string(from: workout.startDate),
+                    "endDate": formatter.string(from: workout.endDate),
                     "durationMinutes": workout.duration / 60,
                     "distanceMeters": workout.totalDistance?.doubleValue(for: .meter()) ?? 0.0,
                     "energyBurned": workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0.0
